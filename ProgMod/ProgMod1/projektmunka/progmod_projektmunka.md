@@ -7,12 +7,15 @@
 
 ## Hogyan működik az algoritmus?
 1. Kezdetben a prioritási sorba (`heap`) beleteszi a kezdőpontot.
-2. Amíg a prioritási sor nem üres: (`while (!heap.isEmpty())`)
+https://github.com/31b4/pte-proginf-bsc/blob/76932ec6784124dd95610aa2fe0f9126e4b3fe49/ProgMod/ProgMod1/projektmunka/Matrix.java#L43-L44
+2. Amíg a prioritási sor nem üres:
     - Kivesz egy pontot a prioritási sorból, és megvizsgálja, hogy ez a pont-e a cél. 
-    `if (current.x == END[0] && current.y == END[1])`
+    https://github.com/31b4/pte-proginf-bsc/blob/76932ec6784124dd95610aa2fe0f9126e4b3fe49/ProgMod/ProgMod1/projektmunka/Matrix.java#L46-L49
     - Ha igen, az algoritmus véget ér, és az útvonal megtalálásra került.
+    https://github.com/31b4/pte-proginf-bsc/blob/76932ec6784124dd95610aa2fe0f9126e4b3fe49/ProgMod/ProgMod1/projektmunka/Matrix.java#L50-L55
     - Ha nem, a pontot megjelöli bejártként, majd megvizsgálja a pont szomszédait.
     - A szomszédokat hozzáadja a prioritási sorhoz, ha még nem voltak bejárva, és kiszámítja a szomszédoktól a célhoz várható költséget, amit az adott ponttól való távolság és egy heurisztikus becslés alapján határoz meg.
+    https://github.com/31b4/pte-proginf-bsc/blob/76932ec6784124dd95610aa2fe0f9126e4b3fe49/ProgMod/ProgMod1/projektmunka/Matrix.java#L58-L72
 3. Ha a célponthoz vezető útvonal nem található a bejárt pontok elfogyása miatt, akkor a keresés eredménye az, hogy a cél nem érhető el a kezdőpontból.
 
 ## Osztályok, Függvények és változók:
