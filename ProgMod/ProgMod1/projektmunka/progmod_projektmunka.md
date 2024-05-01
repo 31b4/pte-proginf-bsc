@@ -52,6 +52,6 @@ https://github.com/31b4/pte-proginf-bsc/blob/76932ec6784124dd95610aa2fe0f9126e4b
 
 ## Források:
 
-https://chat.openai.com/share/8728d606-a320-4b91-9a4d-3afd7043eeb4
-https://chat.openai.com/share/1e67c17d-2a5f-4ed5-8d68-bb3a91dd48a6
-https://chat.openai.com/share/a6a1a992-db64-4c5b-82a9-5e37d01995d8
+- https://chat.openai.com/share/8728d606-a320-4b91-9a4d-3afd7043eeb4
+- https://chat.openai.com/share/1e67c17d-2a5f-4ed5-8d68-bb3a91dd48a6
+- https://chat.openai.com/share/a6a1a992-db64-4c5b-82a9-5e37d01995d8
