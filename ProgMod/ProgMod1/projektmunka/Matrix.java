@@ -4,6 +4,24 @@ import java.util.*;
 
 
 public class Matrix {
+    int[][] matrix3x3 = {
+            {0, 1, 0},
+            {2, 0, 1},
+            {1, 2, 0}
+    };
+    int[][] matrix4x4 = {
+        {0, 2, 0, 0},
+        {2, 2, 1, 0},
+        {1, 2, 0, 0},
+        {0, 0, 0, 0}
+    };
+    int[][] matrix5x5 = {
+        {0, 1, 2, 0, 0},
+        {2, 0, 0, 0, 0},
+        {2, 2, 2, 2, 0},
+        {2, 2, 0, 2, 0},
+        {2, 2, 0, 2, 0}
+    };
     static class Node {
         int x, y, cost;
         ArrayList<int[]> path;
@@ -57,34 +75,17 @@ public class Matrix {
     }
 
     public static void main(String[] args) {
-        int[][] matrix3x3 = {
-            {0, 1, 0},
-            {2, 0, 1},
-            {1, 2, 0}
-        };
-        int[][] matrix4x4 = {
-            {0, 2, 0, 0},
-            {2, 2, 1, 0},
-            {1, 2, 0, 0},
-            {0, 0, 0, 0}
-        };
-        int[][] matrix5x5 = {
-            {0, 1, 2, 0, 0},
-            {2, 0, 0, 0, 0},
-            {2, 2, 2, 2, 0},
-            {2, 2, 0, 2, 0},
-            {2, 2, 0, 2, 0}
-        };
+        Matrix matrix = new Matrix();
         int[] START = {0, 0};
         int[] END = {2, 2};
-        astar(matrix3x3, 3, 3, START, END);
+        astar(matrix.matrix3x3, 3, 3, START, END);
 
         START = new int[]{0, 0};
         END = new int[]{3, 3};
-        astar(matrix4x4, 4, 4, START, END);
+        astar(matrix.matrix4x4, 4, 4, START, END);
 
         START = new int[]{0, 0};
         END = new int[]{4, 4};
-        astar(matrix5x5, 5, 5, START, END);
+        astar(matrix.matrix5x5, 5, 5, START, END);
     }
 }
