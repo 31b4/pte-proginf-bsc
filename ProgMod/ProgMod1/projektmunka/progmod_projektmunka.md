@@ -42,7 +42,9 @@
 - `main`:
     - `Matrix matrix = new Matrix();` egy Matrix tipusu valtozoval elerhetjuk mind a 3 matrixkot (`matrix3x3`,`matrix4x4`,`matrix5x5`)
     - ahoz hogy teszteljuk ` int[] START = {0, 0};
-        int[] END = {2, 2};` megadasara is szukseg van amit a matrix mereteivel (`N`, `M`)
+        int[] END = {2, 2};` megadasara is szukseg van illetve a matrix mereteire (`N`, `M`) 
+        **Például:**
+        https://github.com/31b4/pte-proginf-bsc/blob/76932ec6784124dd95610aa2fe0f9126e4b3fe49/ProgMod/ProgMod1/projektmunka/Matrix.java#L78-L81
 
 
 
