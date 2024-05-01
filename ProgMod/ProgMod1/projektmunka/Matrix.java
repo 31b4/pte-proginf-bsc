@@ -4,56 +4,31 @@ import java.util.*;
 
 
 public class Matrix {
-    static int[] START = {0, 0};
-    static int[] END = {2, 2};
-    static int[][] matrix = {
-        {0, 1, 0},
-        {2, 0, 1},
-        {1, 2, 0}
-    };
-    public void matrixKiir(){
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                System.out.print(matrix[i][j] + " ");
-            }
-            System.out.println();
+    static class Node {
+        int x, y, cost;
+        ArrayList<int[]> path;
+
+        public Node(int x, int y, int cost, ArrayList<int[]> path) {
+            this.x = x;
+            this.y = y;
+            this.cost = cost;
+            this.path = new ArrayList<>(path);
         }
     }
-}
 
-class Node implements Comparable<Node> {
-    int x, y, cost;
-    ArrayList<int[]> path;
+    public static void astar(int[][] matrix, int N, int M, int[] START, int[] END) {
+        PriorityQueue<Node> heap = new PriorityQueue<>(Comparator.comparingInt(a -> a.cost));
+        HashSet<String> visited = new HashSet<>();
 
-    public Node(int x, int y, int cost, ArrayList<int[]> path) {
-        this.x = x;
-        this.y = y;
-        this.cost = cost;
-        this.path = new ArrayList<>(path);
-    }
-
-    @Override
-    public int compareTo(Node other) {
-        return Integer.compare(this.cost, other.cost);
-    }
-}
-
-class AStar {
-    static PriorityQueue<Node> heap = new PriorityQueue<>();
-    static HashSet<String> visited = new HashSet<>();
-
-
-
-    static void astar(int[][] matrix) {
         ArrayList<int[]> startPath = new ArrayList<>();
-        startPath.add(new int[]{Matrix.START[0], Matrix.START[1]});
-        Node startNode = new Node(0, 0, matrix[0][0], startPath);
+        startPath.add(new int[]{START[0], START[1]});
+        Node startNode = new Node(START[0], START[1], matrix[START[0]][START[1]], startPath);
         heap.add(startNode);
 
         while (!heap.isEmpty()) {
             Node current = heap.poll();
 
-            if (current.x == Matrix.END[0] && current.y == Matrix.END[1]) {
+            if (current.x == END[0] && current.y == END[1]) {
                 System.out.println("Pontszám: " + current.cost);
                 System.out.println("Útvonal:");
                 for (int[] point : current.path) {
@@ -68,9 +43,8 @@ class AStar {
             for (int[] dir : directions) {
                 int newX = current.x + dir[0];
                 int newY = current.y + dir[1];
-
-                if (0 <= newX && newX < 3 && 0 <= newY && newY < 3 &&
-                    !visited.contains(newX + "-" + newY)) {
+                if (0 <= newX && newX < N && 0 <= newY && newY < M &&
+                    !visited.contains(newX + "-" + newY) && matrix[newX][newY] != -1) {
                     int newCost = current.cost + matrix[newX][newY];
                     ArrayList<int[]> newPath = new ArrayList<>(current.path);
                     newPath.add(new int[]{newX, newY});
@@ -78,11 +52,39 @@ class AStar {
                 }
             }
         }
+
+        System.out.println("Nincs megoldás.");
     }
 
     public static void main(String[] args) {
-        Matrix matrix = new Matrix();
-        matrix.matrixKiir();
-        astar(matrix.matrix);
+        int[][] matrix3x3 = {
+            {0, 1, 0},
+            {2, 0, 1},
+            {1, 2, 0}
+        };
+        int[][] matrix4x4 = {
+            {0, 2, 0, 0},
+            {2, 2, 1, 0},
+            {1, 2, 0, 0},
+            {0, 0, 0, 0}
+        };
+        int[][] matrix5x5 = {
+            {0, 1, 2, 0, 0},
+            {2, 0, 0, 0, 0},
+            {2, 2, 2, 2, 0},
+            {2, 2, 0, 2, 0},
+            {2, 2, 0, 2, 0}
+        };
+        int[] START = {0, 0};
+        int[] END = {2, 2};
+        astar(matrix3x3, 3, 3, START, END);
+
+        START = new int[]{0, 0};
+        END = new int[]{3, 3};
+        astar(matrix4x4, 4, 4, START, END);
+
+        START = new int[]{0, 0};
+        END = new int[]{4, 4};
+        astar(matrix5x5, 5, 5, START, END);
     }
 }
