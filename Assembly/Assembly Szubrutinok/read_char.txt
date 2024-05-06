@@ -1,0 +1,8 @@
+read_char proc 
+PUSH AX
+MOV AH, 1
+INT 21h
+MOV DL, AL
+POP AX
+RET
+read_char endp

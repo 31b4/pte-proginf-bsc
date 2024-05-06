@@ -1,0 +1,19 @@
+read_decimal proc
+PUSH AX ;AX mentése a verembe
+PUSH BX ;BX mentése a verembe
+MOV BL, 10 ;BX-be a számrendszer alapszáma, ezzel szorzunk
+XOR AX, AX ;AX törlése
+read_decimal_new:
+CALL read_char ;Egy karakter beolvasása
+CMP DL, CR ;ENTER ellenőrzése
+JE read_decimal_end ;Vége, ha ENTER volt az utolsó karakter
+SUB DL, "0" ;Karakterkód minusz ”0” kódja
+MUL BL ;AX szorzása 10-zel
+ADD AL, DL ;A következő helyi érték hozzáadása
+JMP read_decimal_new ;A következő karakter beolvasása
+read_decimal_end:
+MOV DL, AL ;DL-be a beírt szám
+POP BX ;AB visszaállítása
+POP AX ;AX visszaállítása
+RET ;Visszatérés a hívó rutinba
+read_decimal endp

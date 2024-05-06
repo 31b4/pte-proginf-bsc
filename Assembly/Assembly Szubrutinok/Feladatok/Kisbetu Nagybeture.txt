@@ -1,0 +1,71 @@
+.MODEL SMALL
+.STACK
+.DATA 
+	String DB "TesZT szTrING", 0
+
+.CODE
+	MAIN PROC
+		CALL clear_screen
+		CALL convert_to_uppercase
+		CALL sys_exit
+	MAIN ENDP
+
+	convert_to_uppercase PROC
+		MOV AX, DGROUP 					; adatszegmens cimenek kinyerese
+		MOV DS, AX 						; adatszegmens cimenek tarolasa DS-ben (hosszu tavu tarolas)
+		LEA BX, String 					; creating the first pointer of the string constant
+
+		next_char:
+			MOV DL, [BX] 				; a pointer adott cimen található érték (= karakter) kimentése DL-be  // a cimet folyamatosan növeljük BL incrementálásval
+			OR DL, DL					; DL reset 
+			JZ stop						; ha elértük az endbitet, akkor megallunk (konstans , 0) <-- a 0 az endbit // JZ = jump near if 0
+			CMP DL, 'z'					; beolvasott ertek osszehasonlitasa az utolso kisbetuvel (z)
+			JLE convert_to_upcase_char	; ha a beolvasott ertek kisebb vagy egyenlo az utolso kisbetu ascii ertekevel, akkor nagybetuve alakitjuk // JLE = less than or equal to
+			JMP print_char
+		convert_to_upcase_char:
+			CMP DL, 'a'					; beolvasott ertek osszehasonlitasa az elso kisbetuvel (a)
+			JL print_char				; ha kisebb a beolvasott ertek az elso kisbetunel, akkor szimplan kiiratjuk -- mert nagybetu vagy specialis karakter lehet
+			SUB DL, 'a'-'A'				; ha a beolvasott ertek a-z kozott van, akkor kivonjuk belole a kis es nagybetuk kozotti ascii tavolsagot, igy megkapjuk az adott kisbetu nagybetu valtozatat
+		print_char:
+			CALL write_char				; kiiratjuk a nagybetu kaarktert
+			INC BX						; incrementing loop counter so that we'll skip to the next character
+			JMP next_char
+		stop:
+			RET
+	convert_to_uppercase ENDP
+
+    clear_screen PROC
+        xor AL,AL
+        xor CX,CX
+        MOV DH,49          
+        MOV DL,79           
+        MOV BH,7         
+        MOV AH,6
+        INT 10h          
+        RET
+    clear_screen ENDP
+
+	write_char PROC ;A DL-ben levo karakter kiirasa a kepernyore
+		PUSH AX ;AX mentese a verembe
+		MOV AH, 2 ; AH-ba a kepernyore iras funkciokodja
+		INT 21h ; Karakter kiirasa
+		POP AX ;AX visszaallitasa
+		RET ;Visszateres a hivo rutinba
+	write_char ENDP
+
+	cr_lf PROC
+		PUSH DX ;DX mentese a verembe
+		MOV DL, CR
+		CALL write_char ;kurzor a sor elejere
+		MOV DL, LF
+		CALL write_char ;Kurzor egy sorral lejjebb
+		POP DX ;DX visszaallitasa
+		RET ;Visszateres a hivo rutinba
+	cr_lf ENDP
+
+	sys_exit PROC
+		MOV AH, 4CH ; system CALL: sys_exit
+		INT 21H ; interrupt to perform the previous system CALL
+	sys_exit ENDP
+
+END main

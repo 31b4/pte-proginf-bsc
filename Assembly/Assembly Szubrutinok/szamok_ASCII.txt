@@ -1,0 +1,113 @@
+.model small
+.code
+
+main proc
+mov dl, "0"
+XOR DH, DH
+write:
+
+call convert_decimal
+call cr_lf
+add dl, 1
+cmp dl, "9"+1
+JE end
+jmp write
+end:
+mov ah,4ch
+int 21h
+main endp
+
+
+write_char proc
+push ax
+mov ah, 2
+int 21h
+pop ax
+ret
+write_char endp
+
+CR EQU 10
+LF EQU 13
+cr_lf proc
+
+    PUSH DX
+    MOV DL, CR
+    CALL write_char
+    MOV DL, LF
+    CALL write_char
+    POP DX
+    RET
+
+cr_lf endp
+
+convert_hexa proc
+PUSH CX
+PUSH DX
+
+MOV DH, DL
+MOV CX, 4
+SHR DL, CL
+CALL convert_hexa_digit
+
+MOV DL, DH
+AND DL, 0Fh
+CALL convert_hexa_digit
+
+POP DX
+POP CX
+RET
+convert_hexa endp
+
+convert_hexa_digit proc
+
+    PUSH DX
+    CMP DL, 10
+    JB non_hexa_letter
+    ADD DL, "A"-"0"-10
+non_hexa_letter:
+
+    ADD DL, "0"
+    CALL write_char
+
+    POP DX
+    RET
+
+convert_hexa_digit endp
+
+convert_decimal proc
+
+    PUSH AX
+    PUSH CX
+    PUSH DX
+    PUSH SI
+
+    MOV AX, DX
+    MOV SI, 10
+    XOR CX, CX
+
+decimal_non_zero:
+    XOR DX,DX
+    DIV SI
+
+    PUSH DX
+    INC CX
+    OR AX, AX
+    JNE decimal_non_zero
+
+decimal_loop:
+
+    POP DX
+    CALL convert_hexa_digit
+    LOOP decimal_loop
+
+    POP SI
+    POP DX
+    POP CX
+    POP AX
+    RET
+
+
+convert_decimal endp
+
+
+END main

@@ -1,0 +1,26 @@
+write_decimal proc
+PUSH AX ;AX mentése a verembe
+PUSH CX ;CX mentése a verembe
+PUSH DX ;DX mentése a verembe
+PUSH SI ;SI mentése a verembe
+XOR DH, DH ;DH törlése
+MOV AX, DX ;AX-be a szám
+MOV SI, 10 ;SI-ba az osztó
+XOR CX, CX ;CX-be kerül az osztások száma
+decimal_non_zero:
+XOR DX, DX ;DX törlése
+DIV SI ;DX:AX 32 bites szám osztása SI-vel, az eredmény AXbe, a maradék DX-be kerül
+PUSH DX ;DX mentése a verembe
+INC CX ;Számláló növelése
+OR AX, AX ;Státuszbitek beállítása AX-nek megfelelően
+JNE decimal_non_zero ;Vissza, ha az eredmény még nem nulla
+decimal_loop:
+POP DX ;Az elmentett maradék visszahívása
+CALL write_hexa_digit ;Egy decimális digit kiírása
+LOOP decimal_loop
+POP SI ;SI visszaállítása
+POP DX ;DX visszaállítása
+POP CX ;CX visszaállítása
+POP AX ;AX visszaállítása
+RET ;Visszatérés a hívó rutinba
+write_decimal endp

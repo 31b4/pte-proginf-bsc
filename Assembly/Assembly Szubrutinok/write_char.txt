@@ -1,0 +1,7 @@
+write_char proc
+PUSH AX
+MOV AH, 2
+INT 21h
+POP AX
+RET
+write_char endp

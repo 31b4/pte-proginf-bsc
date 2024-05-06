@@ -1,0 +1,17 @@
+write_binary proc ;kiírandó adat a DL-ben
+PUSH BX ;BX mentése a verembe
+PUSH CX ;CX mentése a verembe
+PUSH DX ;DX mentése a verembe
+MOV BL, DL ;DL másolása BL-be
+MOV CX, 8 ;Ciklusváltozó (CX) beállítása
+binary_digit:
+XOR DL, DL ;DL törlése
+RCL BL, 1 ;Rotálás balra eggyel, kilépő bit a CF-be
+ADC DL, "0" ;DL = DL + 48 + CF
+CALL write_char ;Bináris digit kiírása
+LOOP binary_digit ;Vissza a ciklus elejére
+POP DX ;DX visszaállítása
+POP CX ;CX visszaállítása
+POP BX ;BX visszaállítása
+RET ;Visszatérés a hívó rutinba
+write_binary endp

@@ -1,0 +1,24 @@
+read_hexa proc
+PUSH AX ;AX mentése a verembe
+PUSH BX ;BX mentése a verembe
+MOV BL, 10h ;BX-be a számrendszer alapszáma, ezzel szorzunk
+XOR AX, AX ;AX törlése
+read_hexa_new:
+CALL read_char ;Egy karakter beolvasása
+CMP DL, CR ;ENTER ellenőrzése
+JE read_hexa_end ;Vége, ha ENTER volt az utolsó karakter
+CALL upcase ;Kisbetű átalakítása naggyá
+SUB DL, "0" ;Karakterkód minusz ”0” kódja
+CMP DL, 9 ;Számjegy karakter?
+JBE read_hexa_decimal ;Ugrás, ha decimális számjegy
+SUB DL,7 ;Betű esetén még 7-et levonunk
+read_hexa_decimal:
+MUL BL ;AX szorzása az alappal
+ADD AL, DL ;A következő helyi érték hozzáadása
+JMP read_hexa_new ;A következő karakter beolvasása
+read_hexa_end:
+MOV DL, AL ;DL-be a beírt szám
+POP BX ;BX visszaállítása
+POP AX ;AX visszaállítása
+RET ;Visszatérés a hívó rutinba
+read_hexa endp 

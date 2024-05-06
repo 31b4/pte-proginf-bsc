@@ -1,0 +1,26 @@
+write_hexa proc ;A DL-ben lévő két hexa számjegy kiírása
+PUSH CX ;CX mentése a verembe
+PUSH DX ;DX mentése a verembe
+MOV DH, DL ;DL mentése
+MOV CL, 4 ;Shift-elés száma CX-be
+SHR DL, CL ;DL shift-elése 4 hellyel jobbra
+CALL write_hexa_digit ;Hexadecimális digit kiírása
+MOV DL, DH ;Az eredeti érték visszatöltése DL-be
+AND DL, 0Fh ;A felső négy bit törlése
+CALL write_hexa_digit ;Hexadecimális digit kiírása
+POP DX ;DX visszaállítása
+POP CX ;CX visszaállítása
+RET ;Visszatérés a hívó rutinba
+write_hexa endp 
+
+write_hexa_digit proc
+PUSH DX ;DX mentése a verembe
+CMP DL, 10 ;DL összehasonlítása 10-zel
+JB non_hexa_letter ;Ugrás, ha kisebb 10-nél
+ADD DL, "A"-"0"-10 ;A – F betűt kell kiírni
+non_hexa_letter:
+ADD DL, "0" ;Az ASCII kód megadása
+CALL write_char ;A karakter kiírása
+POP DX ;DX visszaállítása
+RET ;Visszatérés a hívó rutinba
+write_hexa_digit endp 

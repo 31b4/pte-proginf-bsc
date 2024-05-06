@@ -1,0 +1,271 @@
+.MODEL SMALL
+.STACK
+.CODE
+
+main proc ;Főprogram
+CALL read_char ;Karakter beolvasása
+XOR DH, DH ;DH törlése
+CALL cr_lf ;Soremelés
+CALL write_binary ;Karakterkód konvertálása bináris számmá és kiírása a képernyőre
+CALL cr_lf ;Soremelés
+CALL write_decimal ; Karakterkód konvertálása decimális számmá és kiírása a képernyőre
+CALL cr_lf ;Soremelés
+CALL write_hexa ;Konvertálás hexadecimális számmá és kiírása a képernyőre
+MOV AH,4Ch ;Kilépés
+INT 21h
+main endp
+
+
+;karakter beolvasása
+
+read_char proc ;Karakter beolvasása. A beolvasott karakter DL-be kerül
+PUSH AX ;AX mentése a verembe
+MOV AH, 1 ;AH-ba a beolvasás funkciókód
+INT 21h ;Egy karakter beolvasása, a kód AL-be kerül
+CMP AL, 27
+JE escape
+MOV DL, AL ;DL-be a karakter kódja
+POP AX ;AX visszaállítása
+RET ;Visszatérés a hívó rutinba
+escape:
+MOV AH,4Ch ;Kilépés
+INT 21h
+read_char endp
+
+
+;karakter kiírása
+
+write_char proc ;A DL-ben lévő karakter kiírása a képernyőre
+PUSH AX ;AX mentése a verembe
+MOV AH, 2 ; AH-ba a képernyőre írás funkciókódja
+INT 21h ; Karakter kiírása
+POP AX ;AX visszaállítása
+RET ;Visszatérés a hívó rutinba
+write_char endp
+
+
+;bináris beolvasás
+
+read_binary proc
+PUSH AX ;AX mentése a verembe
+XOR AX, AX ;AX törlése
+read_binary_new:
+CALL read_char ;Egy karakter beolvasása
+CMP DL, CR ;ENTER ellenőrzése
+JE read_binary_end ;Vége, ha ENTER volt az utolsó karakter
+SUB DL, "0" ;Karakterkód minusz ”0” kódja
+SAL AL, 1 ;Szorzás 2-vel, shift eggyel balra
+ADD AL, DL ;A következő helyi érték hozzáadása
+JMP read_binary_new ;A következő karakter beolvasása
+read_binary_end:
+MOV DL, AL ;DL-be a beírt szám
+POP AX ;AX visszaállítása
+RET ;Visszatérés a hívó rutinba
+read_binary endp
+
+
+;bináris kiírás
+
+write_binary proc ;kiírandó adat a DL-ben
+PUSH BX ;BX mentése a verembe
+PUSH CX ;CX mentése a verembe
+PUSH DX ;DX mentése a verembe
+MOV BL, DL ;DL másolása BL-be
+MOV CX, 8 ;Ciklusváltozó (CX) beállítása
+binary_digit:
+XOR DL, DL ;DL törlése
+RCL BL, 1 ;Rotálás balra eggyel, kilépő bit a CF-be
+ADC DL, "0" ;DL = DL + 48 + CF
+CALL write_char ;Bináris digit kiírása
+LOOP binary_digit ;Vissza a ciklus elejére
+POP DX ;DX visszaállítása
+POP CX ;CX visszaállítása
+POP BX ;BX visszaállítása
+RET ;Visszatérés a hívó rutinba
+write_binary endp
+
+
+;hexadecimális beolvasás
+
+read_hexa proc
+PUSH AX ;AX mentése a verembe
+PUSH BX ;BX mentése a verembe
+MOV BL, 10h ;BX-be a számrendszer alapszáma, ezzel szorzunk
+XOR AX, AX ;AX törlése
+
+read_hexa_new:
+CALL read_char ;Egy karakter beolvasása
+CMP DL, CR ;ENTER ellenőrzése
+JE read_hexa_end ;Vége, ha ENTER volt az utolsó karakter
+
+CALL upcase ;Kisbetű átalakítása naggyá
+SUB DL, "0" ;Karakterkód minusz ”0” kódja
+CMP DL, 9 ;Számjegy karakter?
+JBE read_hexa_decimal ;Ugrás, ha decimális számjegy
+SUB DL,7 ;Betű esetén még 7-et levonunk
+
+read_hexa_decimal:
+MUL BL ;AX szorzása az alappal
+ADD AL, DL ;A következő helyi érték hozzáadása
+JMP read_hexa_new ;A következő karakter beolvasása
+read_hexa_end:
+
+MOV DL, AL ;DL-be a beírt szám
+POP BX ;BX visszaállítása
+POP AX ;AX visszaállítása
+RET ;Visszatérés a hívó rutinba
+read_hexa endp
+
+
+;hexadecimális kiírás
+
+write_hexa proc ;A DL-ben lévő két hexa számjegy kiírása
+PUSH CX ;CX mentése a verembe
+PUSH DX ;DX mentése a verembe
+MOV DH, DL ;DL mentése
+MOV CL, 4 ;Shift-elés száma CX-be
+SHR DL, CL ;DL shift-elése 4 hellyel jobbra
+CALL write_hexa_digit ;Hexadecimális digit kiírása
+MOV DL, DH ;Az eredeti érték visszatöltése DL-be
+AND DL, 0Fh ;A felső négy bit törlése
+CALL write_hexa_digit ;Hexadecimális digit kiírása
+POP DX ;DX visszaállítása
+POP CX ;CX visszaállítása
+RET ;Visszatérés a hívó rutinba
+write_hexa endp
+
+write_hexa_digit proc
+PUSH DX ;DX mentése a verembe
+CMP DL, 10 ;DL összehasonlítása 10-zel
+JB non_hexa_letter ;Ugrás, ha kisebb 10-nél
+ADD DL, "A"-"0"-10 ;A – F betűt kell kiírni
+non_hexa_letter:
+ADD DL, "0" ;Az ASCII kód megadása
+CALL write_char ;A karakter kiírása
+POP DX ;DX visszaállítása
+RET ;Visszatérés a hívó rutinba
+write_hexa_digit endp
+
+
+;decimális beolvasás
+
+read_decimal proc
+PUSH AX ;AX mentése a verembe
+PUSH BX ;BX mentése a verembe
+MOV BL, 10 ;BX-be a számrendszer alapszáma, ezzel szorzunk
+XOR AX, AX ;AX törlése
+read_decimal_new:
+CALL read_char ;Egy karakter beolvasása
+CMP DL, CR ;ENTER ellenőrzése
+JE read_decimal_end ;Vége, ha ENTER volt az utolsó karakter
+SUB DL, "0" ;Karakterkód minusz ”0” kódja
+MUL BL ;AX szorzása 10-zel
+ADD AL, DL ;A következő helyi érték hozzáadása
+JMP read_decimal_new ;A következő karakter beolvasása
+read_decimal_end:
+MOV DL, AL ;DL-be a beírt szám
+POP BX ;AB visszaállítása
+POP AX ;AX visszaállítása
+RET ;Visszatérés a hívó rutinba
+read_decimal endp
+
+
+;decimális kiírás
+
+write_decimal proc
+PUSH AX ;AX mentése a verembe
+PUSH CX ;CX mentése a verembe
+PUSH DX ;DX mentése a verembe
+PUSH SI ;SI mentése a verembe
+XOR DH, DH ;DH törlése
+MOV AX, DX ;AX-be a szám
+MOV SI, 10 ;SI-ba az osztó
+XOR CX, CX ;CX-be kerül az osztások száma
+decimal_non_zero:
+XOR DX, DX ;DX törlése
+DIV SI ;DX:AX 32 bites szám osztása SI-vel, az eredmény AXbe, a maradék DX-be kerül
+PUSH DX ;DX mentése a verembe
+INC CX ;Számláló növelése
+OR AX, AX ;Státuszbitek beállítása AX-nek megfelelően
+JNE decimal_non_zero ;Vissza, ha az eredmény még nem nulla
+decimal_loop:
+POP DX ;Az elmentett maradék visszahívása
+CALL write_hexa_digit ;Egy decimális digit kiírása
+LOOP decimal_loop
+POP SI ;SI visszaállítása
+POP DX ;DX visszaállítása
+POP CX ;CX visszaállítása
+POP AX ;AX visszaállítása
+RET ;Visszatérés a hívó rutinba
+write_decimal endp
+
+
+;soremelés
+
+CR EQU 13 ;CR-be a kurzor a sor elejére kód
+LF EQU 10 ;LF-be a kurzor új sorba kód
+
+cr_lf proc
+PUSH DX ;DX mentése a verembe
+MOV DL, CR
+CALL write_char ;kurzor a sor elejére
+MOV DL, LF
+CALL write_char ;Kurzor egy sorral lejjebb
+POP DX ;DX visszaállítása
+RET ;Visszatérés a hívó rutinba
+cr_lf endp
+
+
+;kis -> nagy betű
+
+upcase proc ;DL-ben lévő kisbetű átalakítása nagybetűvé
+CMP DL, "a" ;A karakterkód és ”a” kódjának összehasonlítása
+JB upcase_end ;A kód kisebb, mint ”a”, nem kisbetű
+CMP DL, "z" ;A karakterkód és ”z” kódjának összehasonlítása
+JA upcase_end ;A kód nagyobb, mint ”z”, nem kisbetű
+SUB DL, "a"-"A" ;DL-ből a kódok különbségét
+upcase_end:
+RET ;Visszatérés a hívó rutinba
+upcase endp
+
+
+;string beolvasás
+
+read_string proc
+PUSH DX ;DX mentése a verembe
+PUSH BX ;BX mentése a verembe
+read_string_new:
+CALL read_char ;Egy karakter beolvasása
+CMP DL, CR ;ENTER ellenőrzése
+JE read_string_end ;Vége, ha ENTER volt az utolsó karakter
+MOV [BX], DL ;Mentés az adatszegmensre
+INC BX ;Következő adatcím
+JMP read_string_new ;Következő karakter beolvasása
+read_string_end:
+XOR DL, DL
+MOV [BX], DL ;Sztring lezárása 0-val
+POP BX ;BX visszaállítása
+POP DX ;DX visszaállítása
+RET ;Visszatérés
+read_string endp
+
+
+;string kiírása
+
+write_string proc ;BX-ben címzett karaktersorozat kiírása 0 kódig.
+PUSH DX ;DX mentése a verembe
+PUSH BX ;BX mentése a verembe
+write_string_new:
+MOV DL, [BX] ;DL-be egy karakter betöltése
+OR DL, DL ;DL vizsgálata
+JZ write_string_end ;0 esetén kilépés
+CALL write_char ;Karakter kiírása
+INC BX ;BX a következő karakterre mutat
+JMP write_string_new ;A következő karakter betöltése
+write_string_end:
+POP BX ;BX visszaállítása
+POP DX ;DX visszaállítása
+RET ;Visszatérés
+write_string endp
+
+END main

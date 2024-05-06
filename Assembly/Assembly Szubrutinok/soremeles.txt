@@ -1,0 +1,11 @@
+CR EQU 13
+LF EQU 10
+cr_lf proc
+PUSH DX
+MOV DL, CR
+CALL write_char
+MOV DL, LF
+CALL write_char
+POP DX
+RET
+cr_lf endp
